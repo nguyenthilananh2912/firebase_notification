@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     FirebaseMessaging.instance.getInitialMessage().then((value) {
+      print("getInitialMessage");
       if (value != null) {
+        print(value.data['message']);
         if (value.data['page'] == "hallo_page") {
           Navigator.push(context, MaterialPageRoute(builder: (context) => HalloPage(message: value.data['message'])));
         } else if (value.data['page'] == "hello_page") {
@@ -34,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     FirebaseMessaging.onMessage.listen((message) async {
+      print("onMessage");
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
@@ -62,11 +66,13 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      if (message.data['page'] == "hallo_page") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HalloPage(message: message.data['message'])));
-      } else if (message.data['page'] == "hello_page") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HelloPage(message: message.data['message'])));
-      }
+      print("onMessageOpenedApp");
+      print(message.data['message']);
+    });
+    FirebaseMessaging.onBackgroundMessage((message) async {
+      print("onBackgroundMessage");
+      print(message.data['message']);
+      await Firebase.initializeApp();
     });
   }
 
@@ -89,6 +95,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
 
 

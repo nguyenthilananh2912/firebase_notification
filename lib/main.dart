@@ -8,9 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'home.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-}
+
 
 AndroidNotificationChannel? channel;
 
@@ -31,9 +29,8 @@ Future<void> main() async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print('abc: ${fcmToken}');
 
-  await FirebaseMessaging.instance.subscribeToTopic('flutter_notification');
+  
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
