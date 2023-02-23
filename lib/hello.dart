@@ -1,19 +1,9 @@
 import 'package:flutter/material.dart';
 
-class HelloPage extends StatefulWidget {
+class HelloPage extends StatelessWidget {
   final String? message;
 
   HelloPage({Key? key, required this.message}) : super(key: key);
-
-  @override
-  _HelloPageState createState() => _HelloPageState();
-}
-
-class _HelloPageState extends State<HelloPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +16,7 @@ class _HelloPageState extends State<HelloPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Xin chào: \n ${widget.message}',
+              'Xin chào: \n $message',
             ),
           ],
         ),
