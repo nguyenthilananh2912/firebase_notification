@@ -24,7 +24,58 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    FirebaseMessaging.instance.getInitialMessage().then((value) {
+    setupGetInitialMessageMessage();
+
+    
+
+    FirebaseMessaging.onMessage.listen(_onMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
+    FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
+  }
+
+  void _onMessageOpenedApp(message) {
+    print("onMessageOpenedApp");
+    print(message.data['message']);
+  }
+
+  Future<void> _onBackgroundMessage(message) async {
+    print("onBackgroundMessage");
+    print(message.data['message']);
+    await Firebase.initializeApp();
+  }
+
+  Future<void> _onMessage(message) async {
+    print("onMessage");
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+  
+    if (notification != null && android != null && !kIsWeb) {
+      String ac = jsonEncode(message.data);
+  
+      flutterLocalNotificationsPlugin!.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel!.id,
+              channel!.name,
+              priority: Priority.high,
+              importance: Importance.max,
+              setAsGroupSummary: true,
+              styleInformation: const DefaultStyleInformation(true, true),
+              largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+              channelShowBadge: true,
+              autoCancel: true,
+              icon: '@drawable/ic_notifications_icon',
+            ),
+          ),
+          payload: ac);
+    }
+  }
+Future<void> setupGetInitialMessageMessage() async {
+
+ await FirebaseMessaging.instance.getInitialMessage().then((value) {
       print("getInitialMessage");
       if (value != null) {
         print(value.data['message']);
@@ -36,46 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
-    FirebaseMessaging.onMessage.listen((message) async {
-      print("onMessage");
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
 
-      if (notification != null && android != null && !kIsWeb) {
-        String ac = jsonEncode(message.data);
-
-        flutterLocalNotificationsPlugin!.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel!.id,
-                channel!.name,
-                priority: Priority.high,
-                importance: Importance.max,
-                setAsGroupSummary: true,
-                styleInformation: const DefaultStyleInformation(true, true),
-                largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-                channelShowBadge: true,
-                autoCancel: true,
-                icon: '@drawable/ic_notifications_icon',
-              ),
-            ),
-            payload: ac);
-      }
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print("onMessageOpenedApp");
-      print(message.data['message']);
-    });
-    FirebaseMessaging.onBackgroundMessage((message) async {
-      print("onBackgroundMessage");
-      print(message.data['message']);
-      await Firebase.initializeApp();
-    });
-  }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,5 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+
 
 
